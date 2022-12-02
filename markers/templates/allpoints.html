@@ -1,0 +1,64 @@
+<!-- {% load static %}-->
+<!DOCTYPE html>
+<!-- {% load static %} -->
+<html lang="en">
+    <head>
+        <title>Show points</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" type="text/css" href="{% static 'allpoints.css' %}" />
+        <link rel="stylesheet" type="text/css" href="https:///unpkg.com/leaflet/dist/leaflet.css" />
+        <script src="https:///unpkg.com/leaflet/dist/leaflet.js"></script>
+    </head>
+    <body>
+        <h1>All stored locations </h1>
+        <ul>
+            {% for point in allpoints %}
+            <li>{{point.name}}
+            </li>
+            {% endfor %}
+        </ul>
+
+        
+        <div id="locmap"></div>
+        
+        <script>
+            var points = "{{ allpoints|safe }}";
+            console.log("Points: " + points);
+
+            var names = [
+                {% for point in allpoints %} 
+                    "{{point.name}}", 
+                {% endfor %}
+            ];
+            console.log("Names:" + names);
+            
+            var loca = [
+                    {% for point in allpoints %}
+                        "point.location",
+                    {% endfor %}
+            ];
+
+        </script>
+                        
+
+        <script>
+            var lat = {{ lat|safe }};
+            var long = {{ long|safe }};
+            var pname = {{ name|safe }};
+            
+            const copyp =
+                "© <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors";
+                const url = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+                const osm = L.tileLayer(url, { attribution: copyp });
+                const mapp = L.map("locmap", { layers: [osm], minZoom: 5 });
+                mapp.locate()
+                    .on("locationfound", (e) => mapp.setView(e.latlng, 8))
+                    .on("locationerror", () => mapp.setView([0, 0], 5));
+                mapp.fitWorld();
+
+                for(i=0;i<lat.length;i++){
+	                L.marker([lat[i],long[i]]).addTo(mapp).bindPopup(name[i]).openPopup();
+                } 
+        </script>
+    </body>
+</html>
